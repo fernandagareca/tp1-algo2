@@ -4,23 +4,23 @@
 
 # TP1
 
-## Repositorio de (Nombre Apellido) - (Padrón) - (Mail)
+## Repositorio de marianela fernanda gareca janko - 109606 - fernanda.gareca321@gmail.com
 
 - Para compilar:
 
 ```bash
-línea de compilación
+gcc *.c -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O2 -g -o tp1
 ```
 
 - Para ejecutar:
 
 ```bash
-línea de ejecución
+./tp1
 ```
 
 - Para ejecutar con valgrind:
 ```bash
-línea con valgrind
+valgring --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 --show-leak-kinds=all --trace-children=yes ./tp1
 ```
 ---
 ##  Funcionamiento
