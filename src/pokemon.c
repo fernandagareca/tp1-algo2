@@ -67,18 +67,17 @@ enum TIPO tipo_pokemon(char tipo)
 	return tipo_buscado;
 }
 /* 
- *pre: 
- * post:
+ *pre: Recibe un string.
+ * post:Verifica que el string tenga algun caracter.
  */
 bool existe_un_nombre(const char* nombre)
 {
-	
     return strlen(nombre) > MINIMO_CARACTERES;
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe un tipo.
+ * post:verifica que el tipo sea algun tipo valido.
  */
 bool existe_un_tipo(char tipo)
 {
@@ -86,8 +85,8 @@ bool existe_un_tipo(char tipo)
 }
 
 /* 
- *pre: 
- * post:
+ *pre: recibe un poder.
+ * post:verifica que sea mayor a 0.
  */
 bool existe_un_poder(int poder)
 {
@@ -95,31 +94,26 @@ bool existe_un_poder(int poder)
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe la linea actual recibe un pokemon.
+ * post:completa los datos del pokemon y verifica que los datos dean correctos.
  */
-void leer_pokemon(const char* linea, pokemon_t* pokemon, bool* correcto)
+void leer_pokemon(const char* linea, pokemon_t* pokemon, bool* datos_correctos)
 {
-	
 	char tipo_poke=' ';
 	int leidos = sscanf(linea, FORMATO_LECTURA_POKEMON, pokemon->nombre, &tipo_poke);
 
-
 	if(leidos != CANTIDAD_DATOS_POKEMON || !existe_un_nombre(pokemon->nombre) || !existe_un_tipo(tipo_poke)){
-	
-		printf("falta para nombre\n");
-		*correcto = false;
+		*datos_correctos = false;
 		return;
 	}
 	pokemon->tipo_pokemon = tipo_pokemon(tipo_poke);
-	//printf(" %s\n",pokemon->nombre);
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe la linea actual un pokemon un ataque 
+ * post: Completa el ataque del pokemon y verifgica que los datos sean correctos.
  */
-void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,bool* correcto)
+void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,bool* datos_correctos)
 {
 	char tipo_ataque=' ';
 	int poder=0;
@@ -127,8 +121,7 @@ void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,
 	int leidos = sscanf(linea, FORMATO_LECTURA_INFO_POKEMON,ataque->nombre,&tipo_ataque, &poder);
 
 	if(leidos != CANTIDAD_DATOS_INFO_POKEMON || !existe_un_nombre(ataque->nombre) || !existe_un_tipo(tipo_ataque) || !existe_un_poder(poder)){
-		printf("falta para ataque\n");
-		*correcto = false;
+		*datos_correctos = false;
 		return;
 	}
 	ataque->tipo = tipo_pokemon(tipo_ataque);
@@ -136,22 +129,22 @@ void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe la linea actual un pokemon un contador lineas.
+ * post:Completa los ataques y al pokemon segun un orden .
  */
-void completar_pokemon(const char* linea_poke, pokemon_t* poke, bool* poke_listo,int contador, bool* correcto)
+void completar_pokemon(const char* linea_poke, pokemon_t* poke, bool* poke_listo,int contador_lineas, bool* correcto)
 {
 
-	if(contador== LINEA_POKEMON){
+	if(contador_lineas== LINEA_POKEMON){
 		leer_pokemon(linea_poke,poke,correcto);
 
-	}else if(contador == LINEA_PRIMNER_ATAQUE){
+	}else if(contador_lineas == LINEA_PRIMNER_ATAQUE){
         leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_PRIMER_ATAQUE]),correcto);
 
-	}else if(contador == LINEA_SEGUNDO_ATAQUE){
+	}else if(contador_lineas == LINEA_SEGUNDO_ATAQUE){
         leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_SEGUNDO_ATAQUE]),correcto);
 
-	}else if(contador == LINEA_TERCER_ATAQUE){
+	}else if(contador_lineas == LINEA_TERCER_ATAQUE){
         leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_TERCER_ATAQUE]),correcto);
         *poke_listo = true;
 	}
@@ -161,13 +154,11 @@ void completar_pokemon(const char* linea_poke, pokemon_t* poke, bool* poke_listo
 informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 {
 	if(path == NULL){
-	
 		return NULL;
 	}
 	
 	FILE*  archivo = fopen(path,LECTURA);
 	if(archivo == NULL){
-	
 		perror("el archivo no pudo abrirse\n");
 		return  NULL;
 	}
@@ -266,8 +257,8 @@ const char *pokemon_nombre(pokemon_t *pokemon)
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe el nombre de un ataque y un ataque 
+ * post: verifica si coinciden los datos del nombre.
  */
 bool buscar_ataque(const char* nombre, struct ataque ataque){
 	return (strcmp(ataque.nombre,nombre) ==0 );
@@ -306,8 +297,8 @@ const struct ataque *pokemon_buscar_ataque(pokemon_t *pokemon, const char *nombr
 }
 
 /* 
- *pre: 
- * post:
+ *pre: Recibe la info de pos pokemones.
+ * post:ordena los pokemones por orden alfabetico.
  */
 void ordenar_pokes(informacion_pokemon_t* info){
 
