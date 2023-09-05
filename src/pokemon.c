@@ -12,12 +12,24 @@
 const int ERROR = -1;
 #define FORMATO_LECTURA_POKEMON "%[^;];%c"
 #define FORMATO_LECTURA_INFO_POKEMON "%[^;];%c;%i"
+#define LECTURA "r"
 const char TIPO_NORMAL ='N';
 const char TIPO_FUEGO='F';
 const char TIPO_AGUA = 'A';
 const char TIPO_PLANTA = 'P';
 const char TIPO_ELECTRICO = 'E';
 const char TIPO_ROCA = 'R';
+const int MINIMO_CARACTERES=0;
+const int PODER_MINIMO=0;
+const int CANTIDAD_DATOS_POKEMON=2;
+const int CANTIDAD_DATOS_INFO_POKEMON=3;
+const int POSICION_PRIMER_ATAQUE = 0;
+const int POSICION_SEGUNDO_ATAQUE = 1;
+const int POSICION_TERCER_ATAQUE = 2;
+const int LINEA_POKEMON=1;
+const int LINEA_PRIMNER_ATAQUE=2;
+const int LINEA_SEGUNDO_ATAQUE=3;
+const int LINEA_TERCER_ATAQUE=4;
 
 struct pokemon {
 	char nombre[MAX_NOMBRE];
@@ -35,7 +47,7 @@ struct info_pokemon {
  *pre: recibe el texto y la posicion actual en el texto. 
  * post: devuelve el tipo segun el caracter 
  */
-enum TIPO tipo(char tipo)
+enum TIPO tipo_pokemon(char tipo)
 {
     enum TIPO tipo_buscado;
 	if(tipo == TIPO_ELECTRICO){
@@ -54,96 +66,117 @@ enum TIPO tipo(char tipo)
 
 	return tipo_buscado;
 }
-
-bool existe_un_nombre(const char* nombre){
+/* 
+ *pre: 
+ * post:
+ */
+bool existe_un_nombre(const char* nombre)
+{
 	
-    return strlen(nombre) > 0;
+    return strlen(nombre) > MINIMO_CARACTERES;
 }
 
-bool existe_un_tipo(char tipo){
+/* 
+ *pre: 
+ * post:
+ */
+bool existe_un_tipo(char tipo)
+{
 	return (tipo ==  TIPO_AGUA || tipo ==  TIPO_ELECTRICO || tipo ==  TIPO_FUEGO || tipo == TIPO_NORMAL || tipo ==  TIPO_PLANTA || tipo ==  TIPO_ROCA);
 }
 
-bool existe_un_poder(int poder){
-	return (poder > 0);
+/* 
+ *pre: 
+ * post:
+ */
+bool existe_un_poder(int poder)
+{
+	return (poder > PODER_MINIMO);
 }
 
-
-
-void leer_pokemon(const char* linea, pokemon_t* pokemon, bool* correcto){
+/* 
+ *pre: 
+ * post:
+ */
+void leer_pokemon(const char* linea, pokemon_t* pokemon, bool* correcto)
+{
 	
 	char tipo_poke=' ';
 	int leidos = sscanf(linea, FORMATO_LECTURA_POKEMON, pokemon->nombre, &tipo_poke);
 
 
-	if(leidos != 2 || !existe_un_nombre(pokemon->nombre) || !existe_un_tipo(tipo_poke)){
+	if(leidos != CANTIDAD_DATOS_POKEMON || !existe_un_nombre(pokemon->nombre) || !existe_un_tipo(tipo_poke)){
 	
 		printf("falta para nombre\n");
 		*correcto = false;
 		return;
-
 	}
-	
-	pokemon->tipo_pokemon = tipo(tipo_poke);
+	pokemon->tipo_pokemon = tipo_pokemon(tipo_poke);
 	//printf(" %s\n",pokemon->nombre);
-	
-
 }
 
-void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,bool* correcto){
-	char tipo_poke=' ';
+/* 
+ *pre: 
+ * post:
+ */
+void leer_ataques(const char* linea, pokemon_t* pokemon, struct ataque* ataque ,bool* correcto)
+{
+	char tipo_ataque=' ';
 	int poder=0;
 	
-	int leidos = sscanf(linea, FORMATO_LECTURA_INFO_POKEMON,ataque->nombre,&tipo_poke, &poder);
+	int leidos = sscanf(linea, FORMATO_LECTURA_INFO_POKEMON,ataque->nombre,&tipo_ataque, &poder);
 
-	if(leidos != 3 || !existe_un_nombre(ataque->nombre) || !existe_un_tipo(tipo_poke) || !existe_un_poder(poder)){
+	if(leidos != CANTIDAD_DATOS_INFO_POKEMON || !existe_un_nombre(ataque->nombre) || !existe_un_tipo(tipo_ataque) || !existe_un_poder(poder)){
 		printf("falta para ataque\n");
 		*correcto = false;
 		return;
 	}
-	ataque->tipo = tipo(tipo_poke);
+	ataque->tipo = tipo_pokemon(tipo_ataque);
 	ataque->poder = (unsigned int)poder;
-
 }
 
-void completar_pokemon(const char* linea_poke, pokemon_t* poke, bool* poke_listo,int contador, bool* correcto){
+/* 
+ *pre: 
+ * post:
+ */
+void completar_pokemon(const char* linea_poke, pokemon_t* poke, bool* poke_listo,int contador, bool* correcto)
+{
 
-
-	if(contador== 1){
+	if(contador== LINEA_POKEMON){
 		leer_pokemon(linea_poke,poke,correcto);
 
-	}else if(contador == 2){
-        leer_ataques(linea_poke,poke, &(poke->ataques[0]),correcto);
+	}else if(contador == LINEA_PRIMNER_ATAQUE){
+        leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_PRIMER_ATAQUE]),correcto);
 
-	}else if(contador == 3){
-        leer_ataques(linea_poke,poke, &(poke->ataques[1]),correcto);
+	}else if(contador == LINEA_SEGUNDO_ATAQUE){
+        leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_SEGUNDO_ATAQUE]),correcto);
 
-	}else if(contador == 4){
-        leer_ataques(linea_poke,poke, &(poke->ataques[2]),correcto);
+	}else if(contador == LINEA_TERCER_ATAQUE){
+        leer_ataques(linea_poke,poke, &(poke->ataques[POSICION_TERCER_ATAQUE]),correcto);
         *poke_listo = true;
 	}
 	
 
 }
-
 informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 {
 	if(path == NULL){
+	
 		return NULL;
+	}
+	
+	FILE*  archivo = fopen(path,LECTURA);
+	if(archivo == NULL){
+	
+		perror("el archivo no pudo abrirse\n");
+		return  NULL;
 	}
 	informacion_pokemon_t* info = malloc(sizeof(informacion_pokemon_t));
 	if(info == NULL){
 		return NULL;
 	}
-	info->pokemones= NULL;
 	info->cantidad=0;
-    
-	FILE*  archivo = fopen(path,"r");
-	if(archivo == NULL){
-		perror("el archivo no pudo abrirse\n");
-		free(info);
-		return  NULL;
-	}
+	info->pokemones=NULL;
     char linea_poke[500];
 	bool poke_listo= false;
 	int contador=0;
@@ -158,9 +191,7 @@ informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 			completar_pokemon(linea_poke,&poke,&poke_listo,contador,&leido_correctamente);
 		}
 		if( poke_listo && leido_correctamente){
-		
-
-			pokemon_t* pokemon_listo = malloc(sizeof(pokemon_t));
+		    pokemon_t* pokemon_listo = malloc(sizeof(pokemon_t));
 			if(pokemon_listo == NULL){
 				free(info);
 				return NULL;
@@ -181,6 +212,7 @@ informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 
 	}
 	if(info->cantidad==0){
+	    fclose(archivo);
 		free(info);
 		return NULL;
 	}
@@ -188,8 +220,6 @@ informacion_pokemon_t *pokemon_cargar_archivo(const char *path)
 	fclose(archivo);
 	return info;
 }
-
-
 
 pokemon_t *pokemon_buscar(informacion_pokemon_t *ip, const char *nombre)
 {   
@@ -200,25 +230,23 @@ pokemon_t *pokemon_buscar(informacion_pokemon_t *ip, const char *nombre)
 
 	int i=0;
 	
-	pokemon_t* poke = malloc(sizeof(pokemon_t));
-	if(poke == NULL){
-		return NULL;
+	pokemon_t* poke;
 	
-	}
 	while(i < ip->cantidad && !encontrado){
-		*poke = *(ip->pokemones[i]);
+		poke = &(*ip->pokemones[i]);
 		if(strcmp(poke->nombre,nombre) == 0){
             encontrado = true;
 		}
 		i++;
 	}
 	if(!encontrado){
-		free(poke);
 		return NULL;
 	}else{
+		printf("se encontro a %s\n",poke->nombre);
 		return poke;
 	}
 }
+
 
 int pokemon_cantidad(informacion_pokemon_t *ip)
 {
@@ -228,6 +256,7 @@ int pokemon_cantidad(informacion_pokemon_t *ip)
 	return ip->cantidad;
 }
 
+
 const char *pokemon_nombre(pokemon_t *pokemon)
 {
 	if(pokemon == NULL){
@@ -236,9 +265,14 @@ const char *pokemon_nombre(pokemon_t *pokemon)
 	return pokemon->nombre;
 }
 
+/* 
+ *pre: 
+ * post:
+ */
 bool buscar_ataque(const char* nombre, struct ataque ataque){
 	return (strcmp(ataque.nombre,nombre) ==0 );
 }
+
 
 enum TIPO pokemon_tipo(pokemon_t *pokemon)
 {
@@ -248,30 +282,33 @@ enum TIPO pokemon_tipo(pokemon_t *pokemon)
 	return pokemon->tipo_pokemon;
 }
 
+
 const struct ataque *pokemon_buscar_ataque(pokemon_t *pokemon, const char *nombre)
 {
 	if(pokemon== NULL || nombre == NULL){
 		return NULL;
 	}
-	struct ataque* ataque = malloc(sizeof(struct ataque));
-	if(ataque == NULL){
-		return NULL;
-	}
+	struct ataque* ataque;
+	
 	bool ataque_encontrado= false;
 	for (int i = 0; i < 3; i++){
 		if(buscar_ataque(nombre,pokemon->ataques[i])){
-			*ataque = pokemon->ataques[i];
+			ataque = &(pokemon->ataques[i]);
 			ataque_encontrado=true;
 
 		}
 	}
 	if(!ataque_encontrado){
-		free(ataque);
 		return NULL;
 	}
+	
 	return ataque;
 }
 
+/* 
+ *pre: 
+ * post:
+ */
 void ordenar_pokes(informacion_pokemon_t* info){
 
     pokemon_t* poke_aux;
@@ -321,14 +358,13 @@ int con_cada_ataque(pokemon_t *pokemon, void (*f)(const struct ataque *, void *)
 void pokemon_destruir_todo(informacion_pokemon_t *ip)
 {
 	if(ip  != NULL){
-		for (int i = ip->cantidad; i > 0; i--){
-			free((ip->pokemones[i-1]));
+		if(ip->pokemones  != NULL){
+			for (int i = 0; i < (ip->cantidad); i++){
+		
+				free((ip->pokemones[i]));
+			}
+			free(ip->pokemones);
 		}
-		free(ip->pokemones);
-	}else{
-		return;
+		free(ip);
 	}
-	free(ip);
-
-	
 }
