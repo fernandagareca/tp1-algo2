@@ -31,7 +31,7 @@ Aclarar en esta parte todas las decisiones que se tomaron al realizar el TP, cos
 
 Incluír **EN TODOS LOS TPS** los diagramas relevantes al problema (mayormente diagramas de memoria para explicar las estructuras, pero se pueden utilizar otros diagramas si es necesario).
 
-### Por ejemplo: diagrma de flujo de la lectura del archivo
+### Por ejemplo: diagrama de flujo de la lectura del archivo
 
 En la funcion principal pokemon cargar archivo ,primero abro el archivo si no se puede abrir retorno null ,casoi contrario que se abrio correctamente reservo memoria para la informacion de los pokemones y verifico haber podido reservar memoria si no pude cierro el archivo y  retorno null, caso contrario leo la linea si hubo algun problema para leer y no habia ningun pokemon cargado anterioremente en el vector cierro el archivo y libero la memoria reservada pero si habian pokemones previamente cargados cierro el archivo y retorno la informacion.
 Pero si se pudo leer la linea y aun no lei 4 lineas necesarias para un pokemon,completo los campos segun los datos de la linea ,en caso de error en el formao de la linea cierro el archivo y retorno la informacion recopilada correctamente ,caso contrario que ya lei 4 lineas cargo el pokemon al vector dinamio y aumento su tamaño ,vuelvo a repetir estos pasos hasta que no se pueda leer mas lineas del archivo.
@@ -81,13 +81,16 @@ if (pokemon != NULL) {
 ## Respuestas a las preguntas teóricas
 
     ```c
+
+    los pokemones quedaron ordenados mediante el ordenamiento por burbujeo que consiste en comparar de a dos pokemones e ir empujando al mayor hasta el final del vector sin considerar a los pokemones ordenados ,y repetimos este procedimiento hasta que todos los pokemones queden ordenados.
+
                       /*ordenaniento por burbujeo*/
      pokemon_t *poke_aux;                                                          -> 1
 	for (int i = 1; i < info->cantidad; i++) {                                    -> n 
 		for (int j = 0; j < info->cantidad - i; j++) {                            -> n -i
 			const char *primer_poke = pokemon_nombre(info->pokemones[j]);         -> 1
 			const char *segundo_poke = pokemon_nombre(info->pokemones[j + 1]);    -> 1
-			if (strcmp(primer_poke, segundo_poke) > 0) {
+			if (strcmp(primer_poke, segundo_poke) > 0) {                          -> 1
 				poke_aux = info->pokemones[j];                                    -> 1
 				info->pokemones[j] = info->pokemones[j + 1];                      -> 1
 				info->pokemones[j + 1] = poke_aux;                                -> 1
@@ -99,6 +102,8 @@ if (pokemon != NULL) {
         COMPLEJIDAD ALGORITMICA
         ========================
     n = info->cantidad
+    el strcmp tiene una complejidad de n con respercto a la longitud de caracteres del nombre pero es este caso que estamos analizando el algoritmo con respecto a la cantidad de pokemones, no tiene importancia y lo tomamos como
+     1 instruccion ,al igual que todas las demas intrucciones de 1 a largo plazo no se toman en cuenta y lo que nos interesa es analisar cuanto tarda n en ejecutarse:
 
     i vas de 1 a n y j va de 0 a n-i lo cual seria de la siguiente forma:
     (ciclos)      (comparaciones)
@@ -113,6 +118,5 @@ if (pokemon != NULL) {
     i = n   ==>    j hace 0
 
     seria una sumatoria --> 1 +2+3+4+...+(n-4)+(n-3)+(n-2)+(n-1)+n = n(n-1)/2 =n²/2 -n/2 
-    que en el peor de los casos que debe hacer el maximo de intercambios en cada ciclo seria O(n²)
-    en el mejor de los casos que el vector este ordenado no haria intercambios y tendria una complejidad
-    algoritmica de O(n)
+    que en el peor de los casos seria O(n²)
+    
